@@ -1,24 +1,25 @@
 package main
 
 import (
-    "log"
-    "net/http"
+	"net/http"
 
-    "github.com/gorilla/mux"
+	"github.com/gin-contrib/static"
+	"github.com/gin-gonic/gin"
 )
 
-var port = "8080"
-
 func main() {
-    log.Fatal(http.ListenAndServe(":"+port, router()))
-}
-
-func router() http.Handler {
-    r := mux.NewRouter()
-    r.Path("/greeting").Methods(http.MethodGet).HandlerFunc(greet)
-    return r
-}
-
-func greet(w http.ResponseWriter, req *http.Request) {
-    _, _ = w.Write([]byte("Hello, world!"))
+	r := gin.Default()
+	r.Use(static.Serve("/", static.LocalFile("../../static/", false)))
+	r.LoadHTMLGlob("../../static/**/*.html")
+	r.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.html", nil)
+	})
+	// r.GET("/login", func(c *gin.Context) {
+	// 	c.HTML(http.StatusOK, "login.html", nil)
+	// })
+	// admin := r.Group("/admin")
+	// admin.GET("/", func(c *gin.Context) {
+	// 	c.HTML(http.StatusOK, "admin-overview.html", nil)
+	// })
+	r.Run(":3000")
 }
